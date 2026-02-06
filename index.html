@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Traineretako arraunlariak eta patroiak lerrokatzeko tresna">
+  <title>Traineraren Alineazioa - Tripulazio Kudeatzailea</title>
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #e74c3c;
+      --success-color: #27ae60;
+      --warning-color: #f39c12;
+      --light-gray: #f8f9fa;
+      --border-color: #dee2e6;
+      --patron-color: #9b59b6;
+      --babor-color: #e74c3c;
+      --estribor-color: #3498db;
+      --kupoak-ok: #27ae60;
+      --kupoak-ko: #e74c3c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 15px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      border: 1px solid var(--border-color);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--light-gray);
+    }
+
+    h2, h3 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 10px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: #666;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-primary {
+      background: var(--secondary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2980b9;
+    }
+
+    .btn-copy-alineacion {
+      background: #f39c12;
+      color: white;
+    }
+
+    .btn-copy-alineacion:hover {
+      background: #e67e22;
+    }
+
+    .btn-delete {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background: #c0392b;
+    }
+
+    .btn-save {
+      background: #27ae60;
+      color: white;
+    }
+
+    .btn-save:hover {
+      background: #219a52;
+    }
+
+    .btn-load {
+      background: #9b59b6;
+      color: white;
+    }
+
+    .btn-load:hover {
+      background: #8e44ad;
+    }
+
+    .alineacion-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 10px 0;
+      padding: 10px;
+      background: var(--light-gray);
+      border-radius: 10px;
+      border: 2px solid var(--border-color);
+    }
+
+    .fila-puestos {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .puesto-vertical {
+      border: 2px solid var(--border-color);
+      padding: 8px;
+      border-radius: 6px;
+      min-width: 80px;
+      background: white;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .puesto-vertical.proel {
+      border-color: var(--primary-color);
+      max-width: 120px;
+      margin: 0 auto;
+    }
+
+    .puesto-vertical.patron {
+      border-color: var(--patron-color);
+      max-width: 120px;
+      margin: 0 auto;
+    }
+
+    .puesto-vertical.babor {
+      border-color: var(--babor-color);
+    }
+
+    .puesto-vertical.estribor {
+      border-color: var(--estribor-color);
+    }
+
+    .puesto-vertical label {
+      font-weight: 600;
+      font-size: 10px;
+    }
+
+    .numero-puesto {
+      font-size: 8px;
+      color: #666;
+    }
+
+    .ajuste-posicion input {
+      width: 30px;
+      padding: 2px;
+      font-size: 9px;
+      text-align: center;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 6px;
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 12px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .tab {
+      padding: 8px 12px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-weight: 600;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      font-size: 11px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .tab.active {
+      color: var(--secondary-color);
+      border-bottom-color: var(--secondary-color);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .alineacion-tabs {
+      display: flex;
+      margin-bottom: 12px;
+      border-bottom: 2px solid var(--border-color);
+      overflow-x: auto;
+    }
+
+    .alineacion-tab {
+      padding: 6px 12px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-weight: 600;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .alineacion-tab.active {
+      color: var(--secondary-color);
+      border-bottom-color: var(--secondary-color);
+    }
+
+    .alineacion-content {
+      display: none;
+    }
+
+    .alineacion-content.active {
+      display: block;
+    }
+
+    .stats-alineacion {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat-alineacion {
+      background: white;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+      min-width: 70px;
+    }
+
+    .stat-alineacion .valor {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .stat-alineacion .label {
+      font-size: 0.65rem;
+      color: #666;
+    }
+
+    .remero-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4px 0;
+      padding: 8px;
+      background: white;
+      border-radius: 4px;
+      border-left: 3px solid var(--secondary-color);
+      font-size: 11px;
+    }
+
+    .remero-item.patron {
+      border-left-color: var(--patron-color);
+    }
+
+    .remero-nombre {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .peso-input {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      font-size: 0.75em;
+    }
+
+    .peso-input input {
+      width: 40px;
+      padding: 2px;
+      text-align: center;
+    }
+
+    .remero-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn-icon {
+      padding: 4px 6px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 10px;
+      background: #e74c3c;
+      color: white;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 4px;
+      border-radius: 8px;
+      font-size: 0.65em;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .badge-patron {
+      background: var(--patron-color);
+      color: white;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 20px 10px;
+      color: #666;
+    }
+
+    .empty-state i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+
+    #listaRemeros, #listaPatrones {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 2px solid var(--border-color);
+      padding: 8px;
+      border-radius: 4px;
+      background: var(--light-gray);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* NUEVO: contenedor para referencia + ajuste en fila */
+    .ref-ajuste {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .ref-ajuste .numero-puesto {
+      font-size: 8px;
+      white-space: nowrap;
+    }
+    .ref-ajuste input {
+      width: 42px; /* 28 * 1.5 ≈ 42 */
+      padding: 2px;
+      font-size: 8px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .panel {
+        padding: 12px;
+      }
+      
+      .fila-puestos {
+        gap: 6px;
+      }
+      
+      .puesto-vertical {
+        min-width: 70px;
+        padding: 6px;
+      }
+      
+      .stats-alineacion {
+        gap: 6px;
+      }
+      
+      .stat-alineacion {
+        min-width: 60px;
+        padding: 5px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Panel de alineaciones (arriba) -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Traineraren Alineazioa</h2>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="crearNuevaAlineacion()">
+            <span>+</span> Berria
+          </button>
+          <button class="btn btn-copy-alineacion" onclick="copiarAlineacion()">
+            <span>📋</span> Kopiatu
+          </button>
+          <button class="btn btn-delete" onclick="eliminarAlineacion()">
+            <span>🗑️</span> Ezabatu
+          </button>
+          <button class="btn btn-save" onclick="exportarAlineacion()">
+            <span>💾</span> Esportatu
+          </button>
+          <button class="btn btn-load" onclick="document.getElementById('fileInput').click()">
+            <span>📂</span> Inportatu
+          </button>
+          <input type="file" id="fileInput" accept=".json" onchange="importarAlineacion(event)">
+        </div>
+      </div>
+
+      <div class="alineacion-tabs" id="alineacionTabs"></div>
+      <div id="alineacionesContainer"></div>
+    </div>
+
+    <!-- Panel de tripulación (abajo) -->
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Tripulazioa</h3>
+        <button class="btn btn-primary" onclick="mostrarModalAgregar()">
+          <span>+</span> Gehitu
+        </button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="cambiarTab('remeros')">Arraunlariak (26)</button>
+        <button class="tab" onclick="cambiarTab('patrones')">Patroiak (4)</button>
+      </div>
+
+      <div id="tab-remeros" class="tab-content active">
+        <div id="listaRemeros"></div>
+      </div>
+      <div id="tab-patrones" class="tab-content">
+        <div id="listaPatrones"></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-value" id="totalPersonas">30</div>
+          <div class="stat-label">Guztira</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="pesoPromedio">0 kg</div>
+          <div class="stat-label">Bataz Bestekoa</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para añadir persona -->
+  <div id="modalAgregar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 10px; width: 300px; max-width: 90%;">
+      <h3>Pertsona Gehitu</h3>
+      <label>Izena:</label>
+      <input type="text" id="nuevoNombre" style="width: 100%; padding: 6px; margin-bottom: 8px;">
+      <label>Pisua (kg):</label>
+      <input type="number" id="nuevoPeso" step="0.1" style="width: 100%; padding: 6px; margin-bottom: 8px;">
+      <label>Mota:</label>
+      <select id="nuevoTipo" style="width: 100%; padding: 6px; margin-bottom: 12px;">
+        <option value="remero">Arraunlari</option>
+        <option value="patron">Patroi</option>
+      </select>
+      <div style="display: flex; gap: 6px; justify-content: flex-end;">
+        <button class="btn" onclick="cerrarModal()" style="background: #95a5a6; color: white;">Utzi</button>
+        <button class="btn btn-primary" onclick="agregarPersona()">Gehitu</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- CATEGORÍAS FIJAS ----------
+    const categorias = {
+      // harrobikoa (2 puntos)
+      "Peru Alkorta":"harrobikoa",
+      "Unax Aranburu":"harrobikoa",
+      "Ander Balda":"harrobikoa",
+      "Arkaitz Diaz":"harrobikoa",
+      "Unax Espinosa":"harrobikoa",
+      "Iñigo Goenaga":"harrobikoa",
+      "Julen Iriondo":"harrobikoa",
+      "Jon Iruretagoiena":"harrobikoa",
+      "Peru Jauregi":"harrobikoa",
+      "Unai Loyarte":"harrobikoa",
+      "Marcos Medina":"harrobikoa",
+      "Aitor Murgiondo":"harrobikoa",
+      "Nico Rodriguez":"harrobikoa",
+      "Ekaitz Otegi":"harrobikoa",
+      "Aratz Tejedor":"harrobikoa",
+      "Erik Tejada":"harrobikoa",
+      "Jon Trecet":"harrobikoa",
+      // berezkoa (1 punto)
+      "Joanes Balenciaga":"berezkoa",
+      "Igor Frances":"berezkoa",
+      "Joxe Leibar":"berezkoa",
+      "Endika Lopez":"berezkoa",
+      "Xabat Olaetxea":"berezkoa",
+      "Xabat Pastor":"berezkoa",
+      "Iñaki Urtubia":"berezkoa",
+      "Iker Imaz":"berezkoa",
+      // resto → ez-berezkoa (0 puntos)
+    };
+
+    function getCategoria(nombre){
+      return categorias[nombre] || "ez-berezkoa";
+    }
+    function getPuntosCategoria(cat){
+      if(cat==="harrobikoa") return 2;
+      if(cat==="berezkoa") return 1;
+      return 0;
+    }
+
+    // ---------- DATOS REALES ----------
+    let personas = [
+      // Arraunlariak
+      {id:1, nombre:"Peru Alkorta", peso:76.0, tipo:"remero"},
+      {id:2, nombre:"Unax Aranburu", peso:71.1, tipo:"remero"},
+      {id:3, nombre:"Ander Balda", peso:97, tipo:"remero"},
+      {id:4, nombre:"Joanes Balenciaga", peso:78.4, tipo:"remero"},
+      {id:5, nombre:"Asier Carballeda", peso:96, tipo:"remero"},
+      {id:6, nombre:"Unax Espinosa", peso:73, tipo:"remero"},
+      {id:7, nombre:"Igor Frances", peso:87.8, tipo:"remero"},
+      {id:8, nombre:"Iñigo Goenaga", peso:75, tipo:"remero"},
+      {id:9, nombre:"Luis Gonzalez", peso:73.8, tipo:"remero"},
+      {id:10, nombre:"Iker Imaz", peso:75.3, tipo:"remero"},
+      {id:11, nombre:"Peru Jauregi", peso:77.9, tipo:"remero"},
+      {id:12, nombre:"Jaime Lara", peso:91.6, tipo:"remero"},
+      {id:13, nombre:"Joxe Leibar", peso:80.0, tipo:"remero"},
+      {id:14, nombre:"Endika Lopez", peso:87.0, tipo:"remero"},
+      {id:15, nombre:"Unai Loyarte", peso:84.0, tipo:"remero"},
+      {id:16, nombre:"Marcos Medina", peso:70.3, tipo:"remero"},
+      {id:17, nombre:"Aitor Murgiondo", peso:82.9, tipo:"remero"},
+      {id:18, nombre:"Nico Rodriguez", peso:70.1, tipo:"remero"},
+      {id:19, nombre:"Xabat Olaetxea", peso:76.7, tipo:"remero"},
+      {id:20, nombre:"Ekaitz Otegi", peso:79.2, tipo:"remero"},
+      {id:21, nombre:"Xabat Pastor", peso:80.7, tipo:"remero"},
+      {id:22, nombre:"Aratz Tejedor", peso:78.7, tipo:"remero"},
+      {id:23, nombre:"Javier Sayans", peso:78.8, tipo:"remero"},
+      {id:24, nombre:"Cosme Tarrio", peso:73.2, tipo:"remero"},
+      {id:25, nombre:"Jon Trecet", peso:74, tipo:"remero"},
+      {id:26, nombre:"Iñaki Urtubia", peso:82.4, tipo:"remero"},
+      // Patroiak
+      {id:27, nombre:"Arkaitz Diaz", peso:61.6, tipo:"patron"},
+      {id:28, nombre:"Julen Iriondo", peso:55, tipo:"patron"},
+      {id:29, nombre:"Jon Iruretagoiena", peso:59.7, tipo:"patron"},
+      {id:30, nombre:"Erik Tejada", peso:55, tipo:"patron"}
+    ];
+
+    const posicionesBase = {
+      proel:1045,
+      babor6:925, estribor6:925,
+      babor5:805, estribor5:805,
+      babor4:685, estribor4:685,
+      babor3:565, estribor3:565,
+      babor2:445, estribor2:445,
+      babor1:325, estribor1:325
+    };
+    const ajustesPorDefecto = {
+      proel:-14,
+      babor1:4, estribor1:4,
+      babor2:0, estribor2:0,
+      babor3:0, estribor3:0,
+      babor4:0, estribor4:0,
+      babor5:-2, estribor5:-2,
+      babor6:-8, estribor6:-8
+    };
+
+    let alineaciones = [];
+    let alineacionActualId = 1;
+
+    // ---------- ARRANQUE ----------
+    document.addEventListener('DOMContentLoaded', ()=>{
+      crearNuevaAlineacion("Alineazio Nagusia", true);
+      renderListas();
+      actualizarEstadisticas();
+    });
+
+    // ---------- ALINEACIONES ----------
+    function crearNuevaAlineacion(nombre=null, esPrimera=false){
+      const id = alineaciones.length + 1;
+      const nueva = {
+        id,
+        nombre: nombre || `Alineazioa ${id}`,
+        ajustesPosicion: {...ajustesPorDefecto},
+        selecciones: {
+          proel:'', patron:'',
+          babor1:'', babor2:'', babor3:'', babor4:'', babor5:'', babor6:'',
+          estribor1:'', estribor2:'', estribor3:'', estribor4:'', estribor5:'', estribor6:''
+        },
+        estadisticas: {pesoTotal:0, pesoPromedio:0, centroGravedad:0, personasSeleccionadas:0, puntuacionTotal:0, harrobikoak:0, berezkoak:0}
+      };
+      alineaciones.push(nueva);
+      if(esPrimera) alineacionActualId = id;
+      renderAlineaciones();
+      cambiarAlineacion(id);
+    }
+
+    function copiarAlineacion(){
+      const actual = alineaciones.find(a=>a.id===alineacionActualId);
+      if(!actual) return;
+      const nueva = {
+        id: alineaciones.length+1,
+        nombre: `${actual.nombre} (kopia)`,
+        ajustesPosicion: {...actual.ajustesPosicion},
+        selecciones: {...actual.selecciones},
+        estadisticas: {...actual.estadisticas}
+      };
+      alineaciones.push(nueva);
+      renderAlineaciones();
+      cambiarAlineacion(nueva.id);
+    }
+
+    function eliminarAlineacion(){
+      if (alineaciones.length <= 1) {
+        alert("Ezin da alineazio bakarra ezabatu.");
+        return;
+      }
+      const actual = alineaciones.find(a=>a.id===alineacionActualId);
+      if(!actual) return;
+      if(!confirm(`Ziur zaude "${actual.nombre}" alineazioa ezabatu nahi duzula?`)) return;
+      alineaciones = alineaciones.filter(a=>a.id!==alineacionActualId);
+      alineacionActualId = alineaciones[0].id;
+      renderAlineaciones();
+    }
+
+    function cambiarAlineacion(id){
+      alineacionActualId = id;
+      renderAlineaciones();
+    }
+
+    // ---------- EXPORTAR E IMPORTAR ----------
+    function exportarAlineacion() {
+      const actual = alineaciones.find(a=>a.id===alineacionActualId);
+      if (!actual) {
+        alert("Ez dago alineaziorik esportatzeko.");
+        return;
+      }
+
+      const datosExportar = {
+        alineacion: actual,
+        personas: personas,
+        fechaExportacion: new Date().toISOString(),
+        version: "1.0"
+      };
+
+      const datosStr = JSON.stringify(datosExportar, null, 2);
+      const blob = new Blob([datosStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `alineacion_${actual.nombre.replace(/\s+/g, '_')}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      alert(`Alineazioa "${actual.nombre}" ondo esportatu da!`);
+    }
+
+    function importarAlineacion(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const datos = JSON.parse(e.target.result);
+          
+          // Validar estructura del archivo
+          if (!datos.alineacion || !datos.personas) {
+            throw new Error("Fitxategiaren formatua ez da egokia.");
+          }
+
+          if (confirm("Uneko alineazioa ordezkatuko da. Ziur zaude?")) {
+            // Reemplazar la alineación actual
+            const nuevaAlineacion = {
+              ...datos.alineacion,
+              id: alineacionActualId,
+              nombre: datos.alineacion.nombre + " (inportatua)"
+            };
+            
+            const index = alineaciones.findIndex(a => a.id === alineacionActualId);
+            if (index !== -1) {
+              alineaciones[index] = nuevaAlineacion;
+            }
+
+            renderAlineaciones();
+            actualizarEstadisticasAlineacion(nuevaAlineacion);
+            alert("Alineazioa ondo inportatu da!");
+          }
+        } catch (error) {
+          alert("Errorea fitxategia inportatzean: " + error.message);
+        }
+      };
+      reader.readAsText(file);
+      
+      // Limpiar el input file
+      event.target.value = '';
+    }
+
+    // ---------- RENDER ----------
+    function renderAlineaciones(){
+      const tabsContainer = document.getElementById('alineacionTabs');
+      const container = document.getElementById('alineacionesContainer');
+      tabsContainer.innerHTML = '';
+      container.innerHTML = '';
+
+      alineaciones.forEach(alineacion=>{
+        const tab = document.createElement('button');
+        tab.className = `alineacion-tab ${alineacion.id===alineacionActualId?'active':''}`;
+        tab.textContent = alineacion.nombre;
+        tab.onclick = ()=>cambiarAlineacion(alineacion.id);
+        tabsContainer.appendChild(tab);
+
+        const content = document.createElement('div');
+        content.className = `alineacion-content ${alineacion.id===alineacionActualId?'active':''}`;
+        content.id = `alineacion-${alineacion.id}`;
+        content.innerHTML = crearHTMLAlineacion(alineacion);
+        container.appendChild(content);
+      });
+
+      actualizarSelectores();
+      const actual = alineaciones.find(a=>a.id===alineacionActualId);
+      if(actual) actualizarEstadisticasAlineacion(actual);
+    }
+
+    function crearHTMLAlineacion(alineacion){
+      const puntuacionOk = alineacion.estadisticas.puntuacionTotal >= 12 && alineacion.estadisticas.harrobikoak >= 5;
+      
+      return `
+        <div class="stats-alineacion">
+          <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-personas">0</div><div class="label">Arraunlariak</div></div>
+          <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-peso">0 kg</div><div class="label">Pisua Guztira</div></div>
+          <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-media">0 kg</div><div class="label">Batez Bestekoa</div></div>
+          <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-cg">-- cm</div><div class="label">Grabitate-Zentroa</div></div>
+          <div class="stat-alineacion" id="alineacion-${alineacion.id}-harrobikoak" style="background:${puntuacionOk? 'var(--kupoak-ok)': 'var(--kupoak-ko)'};color:#fff;">
+            <div class="valor">${alineacion.estadisticas.harrobikoak}</div>
+            <div class="label">Harrobikoak</div>
+          </div>
+          <div class="stat-alineacion" id="alineacion-${alineacion.id}-berezkoak" style="background:${puntuacionOk? 'var(--kupoak-ok)': 'var(--kupoak-ko)'};color:#fff;">
+            <div class="valor">${alineacion.estadisticas.berezkoak}</div>
+            <div class="label">Berezkoak</div>
+          </div>
+        </div>
+
+        <!-- DISPOSICIÓN VERTICAL: Proel arriba, luego pares babor/estribor, patrón abajo -->
+        <div class="alineacion-vertical">
+          <!-- Proela (arriba) -->
+          <div class="puesto-vertical proel">
+            <label>Proela</label>
+            <select class="selector-remero" data-puesto="proel" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+            <div class="ref-ajuste">
+              <span class="numero-puesto">+${posicionesBase.proel + (alineacion.ajustesPosicion.proel||0)}cm</span>
+              <input type="number" id="ajuste-proel-${alineacion.id}" value="${alineacion.ajustesPosicion.proel}" min="-30" max="30" onchange="actualizarPosicion(this,1045)">
+            </div>
+          </div>
+
+          <!-- Babor 6 / Estribor 6 -->
+          <div class="fila-puestos">
+            <div class="puesto-vertical babor">
+              <label>Babor 6</label>
+              <select class="selector-remero" data-puesto="babor6" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.babor6 + (alineacion.ajustesPosicion.babor6||0)}cm</span>
+                <input type="number" id="ajuste-babor6-${alineacion.id}" value="${alineacion.ajustesPosicion.babor6}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.babor6})">
+              </div>
+            </div>
+            <div class="puesto-vertical estribor">
+              <label>Estribor 6</label>
+              <select class="selector-remero" data-puesto="estribor6" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.estribor6 + (alineacion.ajustesPosicion.estribor6||0)}cm</span>
+                <input type="number" id="ajuste-estribor6-${alineacion.id}" value="${alineacion.ajustesPosicion.estribor6}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.estribor6})">
+              </div>
+            </div>
+          </div>
+
+          <!-- Babor 5 / Estribor 5 -->
+          <div class="fila-puestos">
+            <div class="puesto-vertical babor">
+              <label>Babor 5</label>
+              <select class="selector-remero" data-puesto="babor5" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.babor5 + (alineacion.ajustesPosicion.babor5||0)}cm</span>
+                <input type="number" id="ajuste-babor5-${alineacion.id}" value="${alineacion.ajustesPosicion.babor5}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.babor5})">
+              </div>
+            </div>
+            <div class="puesto-vertical estribor">
+              <label>Estribor 5</label>
+              <select class="selector-remero" data-puesto="estribor5" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.estribor5 + (alineacion.ajustesPosicion.estribor5||0)}cm</span>
+                <input type="number" id="ajuste-estribor5-${alineacion.id}" value="${alineacion.ajustesPosicion.estribor5}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.estribor5})">
+              </div>
+            </div>
+          </div>
+
+          <!-- Babor 4 / Estribor 4 -->
+          <div class="fila-puestos">
+            <div class="puesto-vertical babor">
+              <label>Babor 4</label>
+              <select class="selector-remero" data-puesto="babor4" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.babor4 + (alineacion.ajustesPosicion.babor4||0)}cm</span>
+                <input type="number" id="ajuste-babor4-${alineacion.id}" value="${alineacion.ajustesPosicion.babor4}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.babor4})">
+              </div>
+            </div>
+            <div class="puesto-vertical estribor">
+              <label>Estribor 4</label>
+              <select class="selector-remero" data-puesto="estribor4" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.estribor4 + (alineacion.ajustesPosicion.estribor4||0)}cm</span>
+                <input type="number" id="ajuste-estribor4-${alineacion.id}" value="${alineacion.ajustesPosicion.estribor4}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.estribor4})">
+              </div>
+            </div>
+          </div>
+
+          <!-- Babor 3 / Estribor 3 -->
+          <div class="fila-puestos">
+            <div class="puesto-vertical babor">
+              <label>Babor 3</label>
+              <select class="selector-remero" data-puesto="babor3" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.babor3 + (alineacion.ajustesPosicion.babor3||0)}cm</span>
+                <input type="number" id="ajuste-babor3-${alineacion.id}" value="${alineacion.ajustesPosicion.babor3}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.babor3})">
+              </div>
+            </div>
+            <div class="puesto-vertical estribor">
+              <label>Estribor 3</label>
+              <select class="selector-remero" data-puesto="estribor3" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.estribor3 + (alineacion.ajustesPosicion.estribor3||0)}cm</span>
+                <input type="number" id="ajuste-estribor3-${alineacion.id}" value="${alineacion.ajustesPosicion.estribor3}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.estribor3})">
+              </div>
+            </div>
+          </div>
+
+          <!-- Babor 2 / Estribor 2 -->
+          <div class="fila-puestos">
+            <div class="puesto-vertical babor">
+              <label>Babor 2</label>
+              <select class="selector-remero" data-puesto="babor2" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.babor2 + (alineacion.ajustesPosicion.babor2||0)}cm</span>
+                <input type="number" id="ajuste-babor2-${alineacion.id}" value="${alineacion.ajustesPosicion.babor2}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.babor2})">
+              </div>
+            </div>
+            <div class="puesto-vertical estribor">
+              <label>Estribor 2</label>
+              <select class="selector-remero" data-puesto="estribor2" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.estribor2 + (alineacion.ajustesPosicion.estribor2||0)}cm</span>
+                <input type="number" id="ajuste-estribor2-${alineacion.id}" value="${alineacion.ajustesPosicion.estribor2}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.estribor2})">
+              </div>
+            </div>
+          </div>
+
+          <!-- Babor 1 / Estribor 1 -->
+          <div class="fila-puestos">
+            <div class="puesto-vertical babor">
+              <label>Babor 1</label>
+              <select class="selector-remero" data-puesto="babor1" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.babor1 + (alineacion.ajustesPosicion.babor1||0)}cm</span>
+                <input type="number" id="ajuste-babor1-${alineacion.id}" value="${alineacion.ajustesPosicion.babor1}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.babor1})">
+              </div>
+            </div>
+            <div class="puesto-vertical estribor">
+              <label>Estribor 1</label>
+              <select class="selector-remero" data-puesto="estribor1" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
+              <div class="ref-ajuste">
+                <span class="numero-puesto">+${posicionesBase.estribor1 + (alineacion.ajustesPosicion.estribor1||0)}cm</span>
+                <input type="number" id="ajuste-estribor1-${alineacion.id}" value="${alineacion.ajustesPosicion.estribor1}" min="-30" max="30" onchange="actualizarPosicion(this,${posicionesBase.estribor1})">
+              </div>
+            </div>
+          </div>
+
+          <!-- Patroia (abajo) -->
+          <div class="puesto-vertical patron">
+            <label>Patroia</label>
+            <select class="selector-patron" data-puesto="patron" onchange="guardarSeleccion(this)"><option value="">Hautatu patroia</option></select>
+          </div>
+        </div>
+      `;
+    }
+
+    // ---------- EVENTOS EN TIEMPO REAL ----------
+    function guardarSeleccion(select){
+      const puesto = select.dataset.puesto;
+      const actual = alineaciones.find(a=>a.id===alineacionActualId);
+      if(!actual) return;
+      actual.selecciones[puesto] = select.value;
+      actualizarSelectores();
+      actualizarEstadisticasAlineacion(actual);
+    }
+
+    function actualizarPosicion(input, posicionBase){
+      const ajuste = parseInt(input.value)||0;
+      const puesto = input.closest('.puesto-vertical');
+      const tipo = obtenerTipoPuesto(puesto);
+      const actual = alineaciones.find(a=>a.id===alineacionActualId);
+      if(!actual) return;
+      actual.ajustesPosicion[tipo] = ajuste;
+      const span = puesto.querySelector('.ref-ajuste .numero-puesto');
+      const nuevaPos = posicionBase + ajuste;
+      span.textContent = `+${nuevaPos}cm`;
+      actualizarEstadisticasAlineacion(actual);
+    }
+
+    function obtenerTipoPuesto(puesto){
+      if(puesto.classList.contains('proel')) return 'proel';
+      if(puesto.classList.contains('patron')) return 'patron';
+      const label = puesto.querySelector('label').textContent.toLowerCase();
+      return label.replace(' ', '');
+    }
+
+    // ---------- CÁLCULO EN TIEMPO REAL ----------
+    function actualizarEstadisticasAlineacion(alineacion){
+      const selectores = document.querySelectorAll(`#alineacion-${alineacion.id} select`);
+      let pesoTotal = 0, momentoTotal = 0, personasSeleccionadas = 0, puntuacionTotal = 0, harrobikoak = 0, berezkoak = 0;
+
+      selectores.forEach(sel=>{
+        if(sel.value){
+          const persona = personas.find(p=>p.id===parseInt(sel.value));
+          if(persona){
+            const tipo = obtenerTipoPuesto(sel.closest('.puesto-vertical'));
+            
+            // TODOS los puestos (incluyendo patrón) cuentan para el cálculo
+            const cat = getCategoria(persona.nombre);
+            const puntos = getPuntosCategoria(cat);
+            puntuacionTotal += puntos;
+            
+            // Contar harrobikoak y berezkoak (incluyendo patrón)
+            if (cat === "harrobikoa") {
+              harrobikoak++;
+            } else if (cat === "berezkoa") {
+              berezkoak++;
+            }
+            
+            // Solo remeros y proel para cálculos de peso y centro de gravedad
+            if(tipo !== 'patron') {
+              const posBase = posicionesBase[tipo];
+              const ajuste = alineacion.ajustesPosicion[tipo]||0;
+              const posFinal = posBase + ajuste;
+              momentoTotal += persona.peso * posFinal;
+              pesoTotal += persona.peso;
+              personasSeleccionadas++;
+            }
+          }
+        }
+      });
+
+      alineacion.estadisticas.pesoTotal = pesoTotal;
+      alineacion.estadisticas.personasSeleccionadas = personasSeleccionadas;
+      alineacion.estadisticas.pesoPromedio = personasSeleccionadas>0?(pesoTotal/personasSeleccionadas).toFixed(1):'0.0';
+      alineacion.estadisticas.puntuacionTotal = puntuacionTotal;
+      alineacion.estadisticas.harrobikoak = harrobikoak;
+      alineacion.estadisticas.berezkoak = berezkoak;
+
+      if(personasSeleccionadas){
+        const cg = momentoTotal / pesoTotal;
+        alineacion.estadisticas.centroGravedad = cg.toFixed(1);
+      }else{
+        alineacion.estadisticas.centroGravedad='--';
+      }
+
+      const prefix = `alineacion-${alineacion.id}`;
+      document.getElementById(`${prefix}-personas`).textContent = personasSeleccionadas;
+      document.getElementById(`${prefix}-peso`).textContent = `${pesoTotal.toFixed(1)} kg`;
+      document.getElementById(`${prefix}-media`).textContent = `${alineacion.estadisticas.pesoPromedio} kg`;
+      document.getElementById(`${prefix}-cg`).textContent = `${alineacion.estadisticas.centroGravedad} cm`;
+      
+      // Actualizar colores según puntuación total (≥12 y ≥5 harrobikoak = verde)
+      const puntuacionOk = puntuacionTotal >= 12 && harrobikoak >= 5;
+      
+      const harrobikoakDiv = document.getElementById(`${prefix}-harrobikoak`);
+      harrobikoakDiv.style.background = puntuacionOk ? 'var(--kupoak-ok)' : 'var(--kupoak-ko)';
+      harrobikoakDiv.style.color = '#fff';
+      harrobikoakDiv.querySelector('.valor').textContent = harrobikoak;
+      
+      const berezkoakDiv = document.getElementById(`${prefix}-berezkoak`);
+      berezkoakDiv.style.background = puntuacionOk ? 'var(--kupoak-ok)' : 'var(--kupoak-ko)';
+      berezkoakDiv.style.color = '#fff';
+      berezkoakDiv.querySelector('.valor').textContent = berezkoak;
+    }
+
+    // ---------- SELECTORES ----------
+    function actualizarSelectores(){
+      const actual = alineaciones.find(a=>a.id===alineacionActualId);
+      if(!actual) return;
+
+      const seleccionados = new Set();
+      document.querySelectorAll(`#alineacion-${actual.id} select`).forEach(sel=>{
+        if(sel.value) seleccionados.add(parseInt(sel.value));
+      });
+
+      document.querySelectorAll(`#alineacion-${actual.id} select`).forEach(select=>{
+        const puesto = select.dataset.puesto;
+        const current = actual.selecciones[puesto];
+        const tipo = select.classList.contains('selector-patron')?'patron':'remero';
+        select.innerHTML = `<option value="">Hautatu ${tipo==='patron'?'patroia':'arraunlaria'}</option>`;
+        personas.filter(p=>p.tipo===tipo).forEach(p=>{
+          if(!seleccionados.has(p.id)||parseInt(current)===p.id){
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            const cat = getCategoria(p.nombre);
+            opt.textContent = `${p.nombre} (${p.peso.toFixed(1)}kg) [${cat}]`;
+            if(parseInt(current)===p.id) opt.selected = true;
+            select.appendChild(opt);
+          }
+        });
+      });
+    }
+
+    // ---------- LISTAS ----------
+    function renderListas(){
+      const remeros = personas.filter(p=>p.tipo==='remero');
+      const patrones = personas.filter(p=>p.tipo==='patron');
+      const render = (lista,tipo)=>{
+        const el = document.getElementById(`lista${tipo==='remero'?'Remeros':'Patrones'}`);
+        if(lista.length===0){
+          el.innerHTML = `<div class="empty-state"><div>${tipo==='remero'?'🚣‍♂️':'🧭'}</div><p>Ez dago ${tipo==='remero'?'arraunlaririk':'patroirik'} zerrendan</p></div>`;
+          return;
+        }
+        el.innerHTML = '';
+        lista.forEach(p=>{
+          const item = document.createElement('div');
+          item.className = `remero-item ${tipo==='patron'?'patron':''}`;
+          const cat = getCategoria(p.nombre);
+          item.innerHTML = `
+            <div class="remero-info">
+              <div class="remero-nombre">${p.nombre}${tipo==='patron'?'<span class="badge badge-patron">Patroi</span>':''} <span class="badge" style="background:${cat==='harrobikoa'?'#27ae60':cat==='berezkoa'?'#f39c12':'#95a5a6'};color:#fff;">${cat}</span></div>
+              <div class="peso-input">
+                <span class="remero-peso">Pisua:</span>
+                <input type="number" value="${p.peso.toFixed(1)}" step="0.1" min="40" max="120" onchange="actualizarPeso(${p.id},this.value)" style="width:40px;">
+                <span>kg</span>
+              </div>
+            </div>
+            <div class="remero-actions">
+              <button class="btn-icon" onclick="eliminarPersona(${p.id})">✕</button>
+            </div>`;
+          el.appendChild(item);
+        });
+      };
+      render(remeros,'remero');
+      render(patrones,'patron');
+    }
+
+    function actualizarEstadisticas(){
+      const total = personas.length;
+      const remeros = personas.filter(p=>p.tipo==='remero').length;
+      const patrones = personas.filter(p=>p.tipo==='patron').length;
+      document.getElementById('totalPersonas').textContent = total;
+      document.querySelector('.tab[onclick="cambiarTab(\'remeros\')"]').textContent = `Arraunlariak (${remeros})`;
+      document.querySelector('.tab[onclick="cambiarTab(\'patrones\')"]').textContent = `Patroiak (${patrones})`;
+      const promedio = personas.length>0?(personas.reduce((s,p)=>s+p.peso,0)/personas.length).toFixed(1):'0.0';
+      document.getElementById('pesoPromedio').textContent = `${promedio} kg`;
+    }
+
+    // ---------- MODAL Y PERSONAS ----------
+    function mostrarModalAgregar(){
+      document.getElementById('modalAgregar').style.display = 'flex';
+    }
+    function cerrarModal(){
+      document.getElementById('modalAgregar').style.display = 'none';
+      document.getElementById('nuevoNombre').value = '';
+      document.getElementById('nuevoPeso').value = '';
+    }
+    function agregarPersona(){
+      const nombre = document.getElementById('nuevoNombre').value.trim();
+      const peso = parseFloat(document.getElementById('nuevoPeso').value);
+      const tipo = document.getElementById('nuevoTipo').value;
+      if(!nombre || isNaN(peso) || peso<40 || peso>120){
+        alert('Sartu izen eta pisu baliodun bat (40-120 kg).');
+        return;
+      }
+      personas.push({id:Date.now(), nombre, peso, tipo});
+      renderListas();
+      actualizarEstadisticas();
+      actualizarSelectores();
+      cerrarModal();
+    }
+    function actualizarPeso(id,peso){
+      const p = parseFloat(peso);
+      if(isNaN(p)||p<40||p>120){
+        alert('Pisuak 40 eta 120 kg artean egon behar du.');
+        renderListas();
+        return;
+      }
+      const persona = personas.find(x=>x.id===id);
+      if(persona){
+        persona.peso = p;
+        actualizarEstadisticas();
+        const actual = alineaciones.find(a=>a.id===alineacionActualId);
+        if(actual) actualizarEstadisticasAlineacion(actual);
+        actualizarSelectores();
+      }
+    }
+    function eliminarPersona(id){
+      if(!confirm('Ziur zaude pertsona hau ezabatu nahi duzula?')) return;
+      personas = personas.filter(p=>p.id!==id);
+      renderListas();
+      actualizarEstadisticas();
+      const actual = alineaciones.find(a=>a.id===alineacionActualId);
+      if(actual) actualizarEstadisticasAlineacion(actual);
+      actualizarSelectores();
+    }
+    function cambiarTab(tab){
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+      document.querySelector(`.tab[onclick="cambiarTab(\'${tab}\')"]`).classList.add('active');
+      document.getElementById(`tab-${tab}`).classList.add('active');
+    }
+  </script>
+</body>
+</html>
