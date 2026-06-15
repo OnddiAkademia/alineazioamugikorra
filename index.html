@@ -16,7 +16,7 @@
       --border-color: #dee2e6;
       --patron-color: #9b59b6;
       --babor-color: #e74c3c;
-      --estribor-color: #3498db;
+      --estribor-color: #27ae60; /* Cambiado a verde para que coincida con lo pedido */
       --kupoak-ok: #27ae60;
       --kupoak-ko: #e74c3c;
     }
@@ -206,7 +206,7 @@
     }
 
     .puesto-vertical.estribor {
-      border-color: var(--estribor-color);
+      border-color: var(--estribor-color); /* Ahora es verde */
     }
 
     .puesto-vertical label {
@@ -415,7 +415,7 @@
       display: none;
     }
 
-    /* NUEVO: contenedor para referencia + ajuste en fila */
+    /* contenedor para referencia + ajuste en fila */
     .ref-ajuste {
       display: flex;
       align-items: center;
@@ -427,7 +427,7 @@
       white-space: nowrap;
     }
     .ref-ajuste input {
-      width: 42px; /* 28 * 1.5 ≈ 42 */
+      width: 42px;
       padding: 2px;
       font-size: 8px;
       text-align: center;
@@ -464,7 +464,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- Panel de alineaciones (arriba) -->
     <div class="panel">
       <div class="panel-header">
         <h2>Traineraren Alineazioa</h2>
@@ -492,7 +491,6 @@
       <div id="alineacionesContainer"></div>
     </div>
 
-    <!-- Panel de tripulación (abajo) -->
     <div class="panel">
       <div class="panel-header">
         <h3>Tripulazioa</h3>
@@ -502,8 +500,8 @@
       </div>
 
       <div class="tabs">
-        <button class="tab active" onclick="cambiarTab('remeros')">Arraunlariak (26)</button>
-        <button class="tab" onclick="cambiarTab('patrones')">Patroiak (4)</button>
+        <button class="tab active" onclick="cambiarTab('remeros')">Arraunlariak</button>
+        <button class="tab" onclick="cambiarTab('patrones')">Patroiak</button>
       </div>
 
       <div id="tab-remeros" class="tab-content active">
@@ -515,7 +513,7 @@
 
       <div class="stats">
         <div class="stat-item">
-          <div class="stat-value" id="totalPersonas">30</div>
+          <div class="stat-value" id="totalPersonas">0</div>
           <div class="stat-label">Guztira</div>
         </div>
         <div class="stat-item">
@@ -526,7 +524,6 @@
     </div>
   </div>
 
-  <!-- Modal para añadir persona -->
   <div id="modalAgregar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
     <div style="background: white; padding: 20px; border-radius: 10px; width: 300px; max-width: 90%;">
       <h3>Pertsona Gehitu</h3>
@@ -550,12 +547,8 @@
     // ---------- CATEGORÍAS FIJAS ----------
     const categorias = {
       // harrobikoa (2 puntos)
-      "Peru Alkorta":"harrobikoa",
-      "Unax Aranburu":"harrobikoa",
       "Ander Balda":"harrobikoa",
       "Arkaitz Diaz":"harrobikoa",
-      "Unax Espinosa":"harrobikoa",
-      "Iñigo Goenaga":"harrobikoa",
       "Julen Iriondo":"harrobikoa",
       "Jon Iruretagoiena":"harrobikoa",
       "Peru Jauregi":"harrobikoa",
@@ -563,10 +556,8 @@
       "Marcos Medina":"harrobikoa",
       "Aitor Murgiondo":"harrobikoa",
       "Nico Rodriguez":"harrobikoa",
-      "Ekaitz Otegi":"harrobikoa",
       "Aratz Tejedor":"harrobikoa",
       "Erik Tejada":"harrobikoa",
-      "Jon Trecet":"harrobikoa",
       // berezkoa (1 punto)
       "Joanes Balenciaga":"berezkoa",
       "Igor Frances":"berezkoa",
@@ -590,33 +581,27 @@
 
     // ---------- DATOS REALES ----------
     let personas = [
-      // Arraunlariak
-      {id:1, nombre:"Peru Alkorta", peso:76.0, tipo:"remero"},
-      {id:2, nombre:"Unax Aranburu", peso:71.1, tipo:"remero"},
-      {id:3, nombre:"Ander Balda", peso:97, tipo:"remero"},
-      {id:4, nombre:"Joanes Balenciaga", peso:78.4, tipo:"remero"},
-      {id:5, nombre:"Asier Carballeda", peso:96, tipo:"remero"},
-      {id:6, nombre:"Unax Espinosa", peso:73, tipo:"remero"},
-      {id:7, nombre:"Igor Frances", peso:87.8, tipo:"remero"},
-      {id:8, nombre:"Iñigo Goenaga", peso:75, tipo:"remero"},
-      {id:9, nombre:"Luis Gonzalez", peso:73.8, tipo:"remero"},
-      {id:10, nombre:"Iker Imaz", peso:75.3, tipo:"remero"},
-      {id:11, nombre:"Peru Jauregi", peso:77.9, tipo:"remero"},
-      {id:12, nombre:"Jaime Lara", peso:91.6, tipo:"remero"},
-      {id:13, nombre:"Joxe Leibar", peso:80.0, tipo:"remero"},
-      {id:14, nombre:"Endika Lopez", peso:87.0, tipo:"remero"},
-      {id:15, nombre:"Unai Loyarte", peso:84.0, tipo:"remero"},
-      {id:16, nombre:"Marcos Medina", peso:70.3, tipo:"remero"},
-      {id:17, nombre:"Aitor Murgiondo", peso:82.9, tipo:"remero"},
-      {id:18, nombre:"Nico Rodriguez", peso:70.1, tipo:"remero"},
-      {id:19, nombre:"Xabat Olaetxea", peso:76.7, tipo:"remero"},
-      {id:20, nombre:"Ekaitz Otegi", peso:79.2, tipo:"remero"},
-      {id:21, nombre:"Xabat Pastor", peso:80.7, tipo:"remero"},
-      {id:22, nombre:"Aratz Tejedor", peso:78.7, tipo:"remero"},
-      {id:23, nombre:"Javier Sayans", peso:78.8, tipo:"remero"},
-      {id:24, nombre:"Cosme Tarrio", peso:73.2, tipo:"remero"},
-      {id:25, nombre:"Jon Trecet", peso:74, tipo:"remero"},
-      {id:26, nombre:"Iñaki Urtubia", peso:82.4, tipo:"remero"},
+      // Arraunlariak (eliminados: Peru Alkorta, Unax Aranburu, Unax Espinosa, Iñigo Goenaga, Ekaitz Otegi, Jon Trecet)
+      {id:3, nombre:"Ander Balda", peso:90.1, tipo:"remero"},
+      {id:4, nombre:"Joanes Balenciaga", peso:72.6, tipo:"remero"},
+      {id:5, nombre:"Asier Carballeda", peso:94.4, tipo:"remero"},
+      {id:7, nombre:"Igor Frances", peso:81.4, tipo:"remero"},
+      {id:9, nombre:"Luis Gonzalez", peso:71.1, tipo:"remero"},
+      {id:10, nombre:"Iker Imaz", peso:71.7, tipo:"remero"},
+      {id:11, nombre:"Peru Jauregi", peso:76.7, tipo:"remero"},
+      {id:12, nombre:"Jaime Lara", peso:86.6, tipo:"remero"},
+      {id:13, nombre:"Joxe Leibar", peso:76.4, tipo:"remero"},
+      {id:14, nombre:"Endika Lopez", peso:83.2, tipo:"remero"},
+      {id:15, nombre:"Unai Loyarte", peso:83.8, tipo:"remero"},
+      {id:16, nombre:"Marcos Medina", peso:68.5, tipo:"remero"},
+      {id:17, nombre:"Aitor Murgiondo", peso:79.9, tipo:"remero"},
+      {id:18, nombre:"Nico Rodriguez", peso:66.9, tipo:"remero"},
+      {id:19, nombre:"Xabat Olaetxea", peso:72.9, tipo:"remero"},
+      {id:21, nombre:"Xabat Pastor", peso:78.6, tipo:"remero"},
+      {id:22, nombre:"Aratz Tejedor", peso:75.1, tipo:"remero"},
+      {id:23, nombre:"Javier Sayans", peso:77.7, tipo:"remero"},
+      {id:24, nombre:"Cosme Tarrio", peso:73.6, tipo:"remero"},
+      {id:26, nombre:"Iñaki Urtubia", peso:77.2, tipo:"remero"},
       // Patroiak
       {id:27, nombre:"Arkaitz Diaz", peso:61.6, tipo:"patron"},
       {id:28, nombre:"Julen Iriondo", peso:55, tipo:"patron"},
@@ -665,7 +650,7 @@
           babor1:'', babor2:'', babor3:'', babor4:'', babor5:'', babor6:'',
           estribor1:'', estribor2:'', estribor3:'', estribor4:'', estribor5:'', estribor6:''
         },
-        estadisticas: {pesoTotal:0, pesoPromedio:0, centroGravedad:0, personasSeleccionadas:0, puntuacionTotal:0, harrobikoak:0, berezkoak:0}
+        estadisticas: {pesoTotal:0, pesoPromedio:0, centroGravedad:0, personasSeleccionadas:0, puntuacionTotal:0, harrobikoak:0, berezkoak:0, pesoBabor:0, pesoEstribor:0}
       };
       alineaciones.push(nueva);
       if(esPrimera) alineacionActualId = id;
@@ -745,13 +730,11 @@
         try {
           const datos = JSON.parse(e.target.result);
           
-          // Validar estructura del archivo
           if (!datos.alineacion || !datos.personas) {
             throw new Error("Fitxategiaren formatua ez da egokia.");
           }
 
           if (confirm("Uneko alineazioa ordezkatuko da. Ziur zaude?")) {
-            // Reemplazar la alineación actual
             const nuevaAlineacion = {
               ...datos.alineacion,
               id: alineacionActualId,
@@ -773,7 +756,6 @@
       };
       reader.readAsText(file);
       
-      // Limpiar el input file
       event.target.value = '';
     }
 
@@ -812,19 +794,27 @@
           <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-peso">0 kg</div><div class="label">Pisua Guztira</div></div>
           <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-media">0 kg</div><div class="label">Batez Bestekoa</div></div>
           <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-cg">-- cm</div><div class="label">Grabitate-Zentroa</div></div>
+          
+          <div class="stat-alineacion" style="background:var(--babor-color); color:#fff;">
+            <div class="valor" id="alineacion-${alineacion.id}-peso-babor" style="color:#fff;">0 kg</div>
+            <div class="label" style="color:rgba(255,255,255,0.9);">Babor Pisua</div>
+          </div>
+          <div class="stat-alineacion" style="background:var(--estribor-color); color:#fff;">
+            <div class="valor" id="alineacion-${alineacion.id}-peso-estribor" style="color:#fff;">0 kg</div>
+            <div class="label" style="color:rgba(255,255,255,0.9);">Estribor Pisua</div>
+          </div>
+          
           <div class="stat-alineacion" id="alineacion-${alineacion.id}-harrobikoak" style="background:${puntuacionOk? 'var(--kupoak-ok)': 'var(--kupoak-ko)'};color:#fff;">
-            <div class="valor">${alineacion.estadisticas.harrobikoak}</div>
-            <div class="label">Harrobikoak</div>
+            <div class="valor" style="color:#fff;">${alineacion.estadisticas.harrobikoak}</div>
+            <div class="label" style="color:rgba(255,255,255,0.9);">Harrobikoak</div>
           </div>
           <div class="stat-alineacion" id="alineacion-${alineacion.id}-berezkoak" style="background:${puntuacionOk? 'var(--kupoak-ok)': 'var(--kupoak-ko)'};color:#fff;">
-            <div class="valor">${alineacion.estadisticas.berezkoak}</div>
-            <div class="label">Berezkoak</div>
+            <div class="valor" style="color:#fff;">${alineacion.estadisticas.berezkoak}</div>
+            <div class="label" style="color:rgba(255,255,255,0.9);">Berezkoak</div>
           </div>
         </div>
 
-        <!-- DISPOSICIÓN VERTICAL: Proel arriba, luego pares babor/estribor, patrón abajo -->
         <div class="alineacion-vertical">
-          <!-- Proela (arriba) -->
           <div class="puesto-vertical proel">
             <label>Proela</label>
             <select class="selector-remero" data-puesto="proel" onchange="guardarSeleccion(this)"><option value="">Hautatu arraunlaria</option></select>
@@ -834,7 +824,6 @@
             </div>
           </div>
 
-          <!-- Babor 6 / Estribor 6 -->
           <div class="fila-puestos">
             <div class="puesto-vertical babor">
               <label>Babor 6</label>
@@ -854,7 +843,6 @@
             </div>
           </div>
 
-          <!-- Babor 5 / Estribor 5 -->
           <div class="fila-puestos">
             <div class="puesto-vertical babor">
               <label>Babor 5</label>
@@ -874,7 +862,6 @@
             </div>
           </div>
 
-          <!-- Babor 4 / Estribor 4 -->
           <div class="fila-puestos">
             <div class="puesto-vertical babor">
               <label>Babor 4</label>
@@ -894,7 +881,6 @@
             </div>
           </div>
 
-          <!-- Babor 3 / Estribor 3 -->
           <div class="fila-puestos">
             <div class="puesto-vertical babor">
               <label>Babor 3</label>
@@ -914,7 +900,6 @@
             </div>
           </div>
 
-          <!-- Babor 2 / Estribor 2 -->
           <div class="fila-puestos">
             <div class="puesto-vertical babor">
               <label>Babor 2</label>
@@ -934,7 +919,6 @@
             </div>
           </div>
 
-          <!-- Babor 1 / Estribor 1 -->
           <div class="fila-puestos">
             <div class="puesto-vertical babor">
               <label>Babor 1</label>
@@ -954,7 +938,6 @@
             </div>
           </div>
 
-          <!-- Patroia (abajo) -->
           <div class="puesto-vertical patron">
             <label>Patroia</label>
             <select class="selector-patron" data-puesto="patron" onchange="guardarSeleccion(this)"><option value="">Hautatu patroia</option></select>
@@ -997,6 +980,7 @@
     function actualizarEstadisticasAlineacion(alineacion){
       const selectores = document.querySelectorAll(`#alineacion-${alineacion.id} select`);
       let pesoTotal = 0, momentoTotal = 0, personasSeleccionadas = 0, puntuacionTotal = 0, harrobikoak = 0, berezkoak = 0;
+      let pesoBabor = 0, pesoEstribor = 0; // Nuevas variables
 
       selectores.forEach(sel=>{
         if(sel.value){
@@ -1004,19 +988,20 @@
           if(persona){
             const tipo = obtenerTipoPuesto(sel.closest('.puesto-vertical'));
             
-            // TODOS los puestos (incluyendo patrón) cuentan para el cálculo
+            // Sumar pesos de babor y estribor
+            if(tipo.startsWith('babor')) pesoBabor += persona.peso;
+            if(tipo.startsWith('estribor')) pesoEstribor += persona.peso;
+            
             const cat = getCategoria(persona.nombre);
             const puntos = getPuntosCategoria(cat);
             puntuacionTotal += puntos;
             
-            // Contar harrobikoak y berezkoak (incluyendo patrón)
             if (cat === "harrobikoa") {
               harrobikoak++;
             } else if (cat === "berezkoa") {
               berezkoak++;
             }
             
-            // Solo remeros y proel para cálculos de peso y centro de gravedad
             if(tipo !== 'patron') {
               const posBase = posicionesBase[tipo];
               const ajuste = alineacion.ajustesPosicion[tipo]||0;
@@ -1035,6 +1020,8 @@
       alineacion.estadisticas.puntuacionTotal = puntuacionTotal;
       alineacion.estadisticas.harrobikoak = harrobikoak;
       alineacion.estadisticas.berezkoak = berezkoak;
+      alineacion.estadisticas.pesoBabor = pesoBabor;
+      alineacion.estadisticas.pesoEstribor = pesoEstribor;
 
       if(personasSeleccionadas){
         const cg = momentoTotal / pesoTotal;
@@ -1048,18 +1035,17 @@
       document.getElementById(`${prefix}-peso`).textContent = `${pesoTotal.toFixed(1)} kg`;
       document.getElementById(`${prefix}-media`).textContent = `${alineacion.estadisticas.pesoPromedio} kg`;
       document.getElementById(`${prefix}-cg`).textContent = `${alineacion.estadisticas.centroGravedad} cm`;
+      document.getElementById(`${prefix}-peso-babor`).textContent = `${pesoBabor.toFixed(1)} kg`;
+      document.getElementById(`${prefix}-peso-estribor`).textContent = `${pesoEstribor.toFixed(1)} kg`;
       
-      // Actualizar colores según puntuación total (≥12 y ≥5 harrobikoak = verde)
       const puntuacionOk = puntuacionTotal >= 12 && harrobikoak >= 5;
       
       const harrobikoakDiv = document.getElementById(`${prefix}-harrobikoak`);
       harrobikoakDiv.style.background = puntuacionOk ? 'var(--kupoak-ok)' : 'var(--kupoak-ko)';
-      harrobikoakDiv.style.color = '#fff';
       harrobikoakDiv.querySelector('.valor').textContent = harrobikoak;
       
       const berezkoakDiv = document.getElementById(`${prefix}-berezkoak`);
       berezkoakDiv.style.background = puntuacionOk ? 'var(--kupoak-ok)' : 'var(--kupoak-ko)';
-      berezkoakDiv.style.color = '#fff';
       berezkoakDiv.querySelector('.valor').textContent = berezkoak;
     }
 
