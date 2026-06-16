@@ -16,7 +16,7 @@
       --border-color: #dee2e6;
       --patron-color: #9b59b6;
       --babor-color: #e74c3c;
-      --estribor-color: #27ae60; /* Cambiado a verde para que coincida con lo pedido */
+      --estribor-color: #27ae60;
       --kupoak-ok: #27ae60;
       --kupoak-ko: #e74c3c;
     }
@@ -206,7 +206,7 @@
     }
 
     .puesto-vertical.estribor {
-      border-color: var(--estribor-color); /* Ahora es verde */
+      border-color: var(--estribor-color);
     }
 
     .puesto-vertical label {
@@ -415,7 +415,6 @@
       display: none;
     }
 
-    /* contenedor para referencia + ajuste en fila */
     .ref-ajuste {
       display: flex;
       align-items: center;
@@ -434,31 +433,12 @@
     }
 
     @media (max-width: 480px) {
-      .container {
-        padding: 10px;
-      }
-      
-      .panel {
-        padding: 12px;
-      }
-      
-      .fila-puestos {
-        gap: 6px;
-      }
-      
-      .puesto-vertical {
-        min-width: 70px;
-        padding: 6px;
-      }
-      
-      .stats-alineacion {
-        gap: 6px;
-      }
-      
-      .stat-alineacion {
-        min-width: 60px;
-        padding: 5px 6px;
-      }
+      .container { padding: 10px; }
+      .panel { padding: 12px; }
+      .fila-puestos { gap: 6px; }
+      .puesto-vertical { min-width: 70px; padding: 6px; }
+      .stats-alineacion { gap: 6px; }
+      .stat-alineacion { min-width: 60px; padding: 5px 6px; }
     }
   </style>
 </head>
@@ -544,29 +524,45 @@
   </div>
 
   <script>
+    // ---------- LOCAL STORAGE ----------
+    function guardarDatosLocal() {
+      const data = {
+        personas: personas,
+        alineaciones: alineaciones,
+        alineacionActualId: alineacionActualId
+      };
+      localStorage.setItem('traineraData', JSON.stringify(data));
+    }
+
+    function cargarDatosLocal() {
+      const dataStr = localStorage.getItem('traineraData');
+      if (dataStr) {
+        try {
+          const data = JSON.parse(dataStr);
+          if (data.personas && data.alineaciones && data.alineaciones.length > 0) {
+            personas = data.personas;
+            alineaciones = data.alineaciones;
+            alineacionActualId = data.alineacionActualId || alineaciones[0].id;
+            return true;
+          }
+        } catch (e) {
+          console.error("Errorea datu lokalak kargatzean:", e);
+        }
+      }
+      return false;
+    }
+
     // ---------- CATEGORÍAS FIJAS ----------
     const categorias = {
       // harrobikoa (2 puntos)
-      "Ander Balda":"harrobikoa",
-      "Arkaitz Diaz":"harrobikoa",
-      "Julen Iriondo":"harrobikoa",
-      "Jon Iruretagoiena":"harrobikoa",
-      "Peru Jauregi":"harrobikoa",
-      "Unai Loyarte":"harrobikoa",
-      "Marcos Medina":"harrobikoa",
-      "Aitor Murgiondo":"harrobikoa",
-      "Nico Rodriguez":"harrobikoa",
-      "Aratz Tejedor":"harrobikoa",
-      "Erik Tejada":"harrobikoa",
+      "Ander Balda":"harrobikoa", "Arkaitz Diaz":"harrobikoa", "Julen Iriondo":"harrobikoa",
+      "Jon Iruretagoiena":"harrobikoa", "Peru Jauregi":"harrobikoa", "Unai Loyarte":"harrobikoa",
+      "Marcos Medina":"harrobikoa", "Aitor Murgiondo":"harrobikoa", "Nico Rodriguez":"harrobikoa",
+      "Aratz Tejedor":"harrobikoa", "Erik Tejada":"harrobikoa",
       // berezkoa (1 punto)
-      "Joanes Balenciaga":"berezkoa",
-      "Igor Frances":"berezkoa",
-      "Joxe Leibar":"berezkoa",
-      "Endika Lopez":"berezkoa",
-      "Xabat Olaetxea":"berezkoa",
-      "Xabat Pastor":"berezkoa",
-      "Iñaki Urtubia":"berezkoa",
-      "Iker Imaz":"berezkoa",
+      "Joanes Balenciaga":"berezkoa", "Igor Frances":"berezkoa", "Joxe Leibar":"berezkoa",
+      "Endika Lopez":"berezkoa", "Xabat Olaetxea":"berezkoa", "Xabat Pastor":"berezkoa",
+      "Iñaki Urtubia":"berezkoa", "Iker Imaz":"berezkoa",
       // resto → ez-berezkoa (0 puntos)
     };
 
@@ -579,9 +575,8 @@
       return 0;
     }
 
-    // ---------- DATOS REALES ----------
+    // ---------- DATOS REALES (Base) ----------
     let personas = [
-      // Arraunlariak (eliminados: Peru Alkorta, Unax Aranburu, Unax Espinosa, Iñigo Goenaga, Ekaitz Otegi, Jon Trecet)
       {id:3, nombre:"Ander Balda", peso:90.1, tipo:"remero"},
       {id:4, nombre:"Joanes Balenciaga", peso:72.1, tipo:"remero"},
       {id:5, nombre:"Asier Carballeda", peso:92.7, tipo:"remero"},
@@ -602,7 +597,6 @@
       {id:23, nombre:"Javier Sayans", peso:77.0, tipo:"remero"},
       {id:24, nombre:"Cosme Tarrio", peso:74.4, tipo:"remero"},
       {id:26, nombre:"Iñaki Urtubia", peso:77.5, tipo:"remero"},
-      // Patroiak
       {id:27, nombre:"Arkaitz Diaz", peso:61.6, tipo:"patron"},
       {id:28, nombre:"Julen Iriondo", peso:55, tipo:"patron"},
       {id:29, nombre:"Jon Iruretagoiena", peso:59.7, tipo:"patron"},
@@ -610,22 +604,14 @@
     ];
 
     const posicionesBase = {
-      proel:1045,
-      babor6:925, estribor6:925,
-      babor5:805, estribor5:805,
-      babor4:685, estribor4:685,
-      babor3:565, estribor3:565,
-      babor2:445, estribor2:445,
-      babor1:325, estribor1:325
+      proel:1045, babor6:925, estribor6:925, babor5:805, estribor5:805,
+      babor4:685, estribor4:685, babor3:565, estribor3:565, babor2:445,
+      estribor2:445, babor1:325, estribor1:325
     };
     const ajustesPorDefecto = {
-      proel:-14,
-      babor1:4, estribor1:4,
-      babor2:0, estribor2:0,
-      babor3:0, estribor3:0,
-      babor4:0, estribor4:0,
-      babor5:-2, estribor5:-2,
-      babor6:-8, estribor6:-8
+      proel:-14, babor1:4, estribor1:4, babor2:0, estribor2:0,
+      babor3:0, estribor3:0, babor4:0, estribor4:0, babor5:-2,
+      estribor5:-2, babor6:-8, estribor6:-8
     };
 
     let alineaciones = [];
@@ -633,21 +619,26 @@
 
     // ---------- ARRANQUE ----------
     document.addEventListener('DOMContentLoaded', ()=>{
-      crearNuevaAlineacion("Alineazio Nagusia", true);
+      const hayDatosLocales = cargarDatosLocal();
+      if (!hayDatosLocales) {
+        crearNuevaAlineacion("Alineazio Nagusia", true);
+      } else {
+        renderAlineaciones();
+      }
       renderListas();
       actualizarEstadisticas();
     });
 
     // ---------- ALINEACIONES ----------
     function crearNuevaAlineacion(nombre=null, esPrimera=false){
-      const id = alineaciones.length + 1;
+      const maxId = alineaciones.reduce((max, a) => Math.max(max, a.id), 0);
+      const id = maxId + 1;
       const nueva = {
         id,
         nombre: nombre || `Alineazioa ${id}`,
         ajustesPosicion: {...ajustesPorDefecto},
         selecciones: {
-          proel:'', patron:'',
-          babor1:'', babor2:'', babor3:'', babor4:'', babor5:'', babor6:'',
+          proel:'', patron:'', babor1:'', babor2:'', babor3:'', babor4:'', babor5:'', babor6:'',
           estribor1:'', estribor2:'', estribor3:'', estribor4:'', estribor5:'', estribor6:''
         },
         estadisticas: {pesoTotal:0, pesoPromedio:0, centroGravedad:0, personasSeleccionadas:0, puntuacionTotal:0, harrobikoak:0, berezkoak:0, pesoBabor:0, pesoEstribor:0}
@@ -656,13 +647,15 @@
       if(esPrimera) alineacionActualId = id;
       renderAlineaciones();
       cambiarAlineacion(id);
+      guardarDatosLocal();
     }
 
     function copiarAlineacion(){
       const actual = alineaciones.find(a=>a.id===alineacionActualId);
       if(!actual) return;
+      const maxId = alineaciones.reduce((max, a) => Math.max(max, a.id), 0);
       const nueva = {
-        id: alineaciones.length+1,
+        id: maxId + 1,
         nombre: `${actual.nombre} (kopia)`,
         ajustesPosicion: {...actual.ajustesPosicion},
         selecciones: {...actual.selecciones},
@@ -671,6 +664,7 @@
       alineaciones.push(nueva);
       renderAlineaciones();
       cambiarAlineacion(nueva.id);
+      guardarDatosLocal();
     }
 
     function eliminarAlineacion(){
@@ -684,32 +678,30 @@
       alineaciones = alineaciones.filter(a=>a.id!==alineacionActualId);
       alineacionActualId = alineaciones[0].id;
       renderAlineaciones();
+      guardarDatosLocal();
     }
 
     function cambiarAlineacion(id){
       alineacionActualId = id;
       renderAlineaciones();
+      guardarDatosLocal();
     }
 
     // ---------- EXPORTAR E IMPORTAR ----------
     function exportarAlineacion() {
       const actual = alineaciones.find(a=>a.id===alineacionActualId);
-      if (!actual) {
-        alert("Ez dago alineaziorik esportatzeko.");
-        return;
-      }
+      if (!actual) return alert("Ez dago alineaziorik esportatzeko.");
 
       const datosExportar = {
         alineacion: actual,
         personas: personas,
         fechaExportacion: new Date().toISOString(),
-        version: "1.0"
+        version: "1.1"
       };
 
       const datosStr = JSON.stringify(datosExportar, null, 2);
       const blob = new Blob([datosStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      
       const link = document.createElement('a');
       link.href = url;
       link.download = `alineacion_${actual.nombre.replace(/\s+/g, '_')}.json`;
@@ -717,8 +709,6 @@
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
-      alert(`Alineazioa "${actual.nombre}" ondo esportatu da!`);
     }
 
     function importarAlineacion(event) {
@@ -730,11 +720,23 @@
         try {
           const datos = JSON.parse(e.target.result);
           
-          if (!datos.alineacion || !datos.personas) {
-            throw new Error("Fitxategiaren formatua ez da egokia.");
+          // Validazio sendoa
+          if (!datos || typeof datos !== 'object') throw new Error("Fitxategiaren formatua ez da egokia (ez da objektua).");
+          if (!datos.alineacion || !datos.alineacion.selecciones || !datos.alineacion.estadisticas) {
+            throw new Error("Alineazioaren egitura ez dago osorik.");
+          }
+          if (!Array.isArray(datos.personas)) {
+            throw new Error("Arraunlarien zerrenda ez da balioduna.");
           }
 
-          if (confirm("Uneko alineazioa ordezkatuko da. Ziur zaude?")) {
+          // Pertsona bikoiztuen egiaztapena
+          const valoresSeleccion = Object.values(datos.alineacion.selecciones).filter(v => v !== "");
+          const unicos = new Set(valoresSeleccion);
+          if (valoresSeleccion.length !== unicos.size) {
+             throw new Error("Inportatutako alineazioak pertsona bikoiztuak ditu.");
+          }
+
+          if (confirm("Uneko alineazioa ordezkatuko da eta pisuak eguneratuko dira. Ziur zaude?")) {
             const nuevaAlineacion = {
               ...datos.alineacion,
               id: alineacionActualId,
@@ -746,8 +748,19 @@
               alineaciones[index] = nuevaAlineacion;
             }
 
+            // Pertsonen pisuak sinkronizatu edota falta direnak gehitu
+            datos.personas.forEach(pIn => {
+               const exists = personas.find(p => p.id === pIn.id);
+               if(exists) exists.peso = pIn.peso; 
+               else personas.push(pIn); 
+            });
+
+            renderListas();
+            actualizarEstadisticas();
             renderAlineaciones();
             actualizarEstadisticasAlineacion(nuevaAlineacion);
+            guardarDatosLocal();
+            
             alert("Alineazioa ondo inportatu da!");
           }
         } catch (error) {
@@ -755,7 +768,6 @@
         }
       };
       reader.readAsText(file);
-      
       event.target.value = '';
     }
 
@@ -954,6 +966,7 @@
       actual.selecciones[puesto] = select.value;
       actualizarSelectores();
       actualizarEstadisticasAlineacion(actual);
+      guardarDatosLocal();
     }
 
     function actualizarPosicion(input, posicionBase){
@@ -967,6 +980,7 @@
       const nuevaPos = posicionBase + ajuste;
       span.textContent = `+${nuevaPos}cm`;
       actualizarEstadisticasAlineacion(actual);
+      guardarDatosLocal();
     }
 
     function obtenerTipoPuesto(puesto){
@@ -980,7 +994,7 @@
     function actualizarEstadisticasAlineacion(alineacion){
       const selectores = document.querySelectorAll(`#alineacion-${alineacion.id} select`);
       let pesoTotal = 0, momentoTotal = 0, personasSeleccionadas = 0, puntuacionTotal = 0, harrobikoak = 0, berezkoak = 0;
-      let pesoBabor = 0, pesoEstribor = 0; // Nuevas variables
+      let pesoBabor = 0, pesoEstribor = 0;
 
       selectores.forEach(sel=>{
         if(sel.value){
@@ -988,7 +1002,6 @@
           if(persona){
             const tipo = obtenerTipoPuesto(sel.closest('.puesto-vertical'));
             
-            // Sumar pesos de babor y estribor
             if(tipo.startsWith('babor')) pesoBabor += persona.peso;
             if(tipo.startsWith('estribor')) pesoEstribor += persona.peso;
             
@@ -996,11 +1009,8 @@
             const puntos = getPuntosCategoria(cat);
             puntuacionTotal += puntos;
             
-            if (cat === "harrobikoa") {
-              harrobikoak++;
-            } else if (cat === "berezkoa") {
-              berezkoak++;
-            }
+            if (cat === "harrobikoa") harrobikoak++;
+            else if (cat === "berezkoa") berezkoak++;
             
             if(tipo !== 'patron') {
               const posBase = posicionesBase[tipo];
@@ -1143,6 +1153,7 @@
       renderListas();
       actualizarEstadisticas();
       actualizarSelectores();
+      guardarDatosLocal();
       cerrarModal();
     }
     function actualizarPeso(id,peso){
@@ -1159,16 +1170,28 @@
         const actual = alineaciones.find(a=>a.id===alineacionActualId);
         if(actual) actualizarEstadisticasAlineacion(actual);
         actualizarSelectores();
+        guardarDatosLocal();
       }
     }
     function eliminarPersona(id){
       if(!confirm('Ziur zaude pertsona hau ezabatu nahi duzula?')) return;
+      
+      // Pertsona hori alineazioetan hautatuta badago, garbitu hautaketa
+      alineaciones.forEach(al => {
+        for (let puesto in al.selecciones) {
+          if (parseInt(al.selecciones[puesto]) === id) {
+            al.selecciones[puesto] = '';
+          }
+        }
+      });
+      
       personas = personas.filter(p=>p.id!==id);
       renderListas();
       actualizarEstadisticas();
       const actual = alineaciones.find(a=>a.id===alineacionActualId);
       if(actual) actualizarEstadisticasAlineacion(actual);
       actualizarSelectores();
+      guardarDatosLocal();
     }
     function cambiarTab(tab){
       document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
