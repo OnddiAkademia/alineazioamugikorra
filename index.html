@@ -575,6 +575,30 @@
       return 0;
     }
 
+    // ---------- PESOS IDEALES ----------
+    const pesosIdeales = {
+      "Ander Balda": 85,
+      "Joanes Balenciaga": 73,
+      "Asier Carballeda": 86,
+      "Igor Frances": 78,
+      "Luis Gonzalez": 69,
+      "Iker Imaz": 71,
+      "Peru Jauregi": 74,
+      "Jaime Lara": 83,
+      "Joxe Leibar": 75,
+      "Endika Lopez": 81,
+      "Unai Loyarte": 80,
+      "Marcos Medina": 67.5,
+      "Aitor Murgiondo": 78,
+      "Nico Rodriguez": 67,
+      "Xabat Olaetxea": 72,
+      "Xabat Pastor": 78,
+      "Aratz Tejedor": 73,
+      "Javier Sayans": 75,
+      "Cosme Tarrio": 75,
+      "Iñaki Urtubia": 75
+    };
+
     // ---------- DATOS REALES (Base) ----------
     let personas = [
       {id:3, nombre:"Ander Balda", peso:90.1, tipo:"remero"},
@@ -641,7 +665,7 @@
           proel:'', patron:'', babor1:'', babor2:'', babor3:'', babor4:'', babor5:'', babor6:'',
           estribor1:'', estribor2:'', estribor3:'', estribor4:'', estribor5:'', estribor6:''
         },
-        estadisticas: {pesoTotal:0, pesoPromedio:0, centroGravedad:0, personasSeleccionadas:0, puntuacionTotal:0, harrobikoak:0, berezkoak:0, pesoBabor:0, pesoEstribor:0}
+        estadisticas: {pesoTotal:0, pesoPromedio:0, centroGravedad:0, centroGravedadIdeal:0, personasSeleccionadas:0, puntuacionTotal:0, harrobikoak:0, berezkoak:0, pesoBabor:0, pesoEstribor:0}
       };
       alineaciones.push(nueva);
       if(esPrimera) alineacionActualId = id;
@@ -696,7 +720,7 @@
         alineacion: actual,
         personas: personas,
         fechaExportacion: new Date().toISOString(),
-        version: "1.1"
+        version: "1.2"
       };
 
       const datosStr = JSON.stringify(datosExportar, null, 2);
@@ -720,7 +744,6 @@
         try {
           const datos = JSON.parse(e.target.result);
           
-          // Validazio sendoa
           if (!datos || typeof datos !== 'object') throw new Error("Fitxategiaren formatua ez da egokia (ez da objektua).");
           if (!datos.alineacion || !datos.alineacion.selecciones || !datos.alineacion.estadisticas) {
             throw new Error("Alineazioaren egitura ez dago osorik.");
@@ -729,7 +752,6 @@
             throw new Error("Arraunlarien zerrenda ez da balioduna.");
           }
 
-          // Pertsona bikoiztuen egiaztapena
           const valoresSeleccion = Object.values(datos.alineacion.selecciones).filter(v => v !== "");
           const unicos = new Set(valoresSeleccion);
           if (valoresSeleccion.length !== unicos.size) {
@@ -748,7 +770,6 @@
               alineaciones[index] = nuevaAlineacion;
             }
 
-            // Pertsonen pisuak sinkronizatu edota falta direnak gehitu
             datos.personas.forEach(pIn => {
                const exists = personas.find(p => p.id === pIn.id);
                if(exists) exists.peso = pIn.peso; 
@@ -803,9 +824,9 @@
       return `
         <div class="stats-alineacion">
           <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-personas">0</div><div class="label">Arraunlariak</div></div>
-          <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-peso">0 kg</div><div class="label">Pisua Guztira</div></div>
           <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-media">0 kg</div><div class="label">Batez Bestekoa</div></div>
-          <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-cg">-- cm</div><div class="label">Grabitate-Zentroa</div></div>
+          <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-cg">-- cm</div><div class="label">G-Zentroa</div></div>
+          <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-cg-ideal">-- cm</div><div class="label">G-Zentro Ideala</div></div>
           
           <div class="stat-alineacion" style="background:var(--babor-color); color:#fff;">
             <div class="valor" id="alineacion-${alineacion.id}-peso-babor" style="color:#fff;">0 kg</div>
@@ -993,7 +1014,8 @@
     // ---------- CÁLCULO EN TIEMPO REAL ----------
     function actualizarEstadisticasAlineacion(alineacion){
       const selectores = document.querySelectorAll(`#alineacion-${alineacion.id} select`);
-      let pesoTotal = 0, momentoTotal = 0, personasSeleccionadas = 0, puntuacionTotal = 0, harrobikoak = 0, berezkoak = 0;
+      let pesoTotal = 0, momentoTotal = 0, momentoIdealTotal = 0, pesoIdealTotal = 0;
+      let personasSeleccionadas = 0, puntuacionTotal = 0, harrobikoak = 0, berezkoak = 0;
       let pesoBabor = 0, pesoEstribor = 0;
 
       selectores.forEach(sel=>{
@@ -1016,8 +1038,15 @@
               const posBase = posicionesBase[tipo];
               const ajuste = alineacion.ajustesPosicion[tipo]||0;
               const posFinal = posBase + ajuste;
+              
               momentoTotal += persona.peso * posFinal;
               pesoTotal += persona.peso;
+              
+              // Uso del peso ideal o, en su defecto, el peso normal registrado de la persona
+              const pesoIdeal = pesosIdeales[persona.nombre] || persona.peso;
+              momentoIdealTotal += pesoIdeal * posFinal;
+              pesoIdealTotal += pesoIdeal;
+
               personasSeleccionadas++;
             }
           }
@@ -1036,15 +1065,19 @@
       if(personasSeleccionadas){
         const cg = momentoTotal / pesoTotal;
         alineacion.estadisticas.centroGravedad = cg.toFixed(1);
+        
+        const cgIdeal = momentoIdealTotal / pesoIdealTotal;
+        alineacion.estadisticas.centroGravedadIdeal = cgIdeal.toFixed(1);
       }else{
         alineacion.estadisticas.centroGravedad='--';
+        alineacion.estadisticas.centroGravedadIdeal='--';
       }
 
       const prefix = `alineacion-${alineacion.id}`;
       document.getElementById(`${prefix}-personas`).textContent = personasSeleccionadas;
-      document.getElementById(`${prefix}-peso`).textContent = `${pesoTotal.toFixed(1)} kg`;
       document.getElementById(`${prefix}-media`).textContent = `${alineacion.estadisticas.pesoPromedio} kg`;
       document.getElementById(`${prefix}-cg`).textContent = `${alineacion.estadisticas.centroGravedad} cm`;
+      document.getElementById(`${prefix}-cg-ideal`).textContent = `${alineacion.estadisticas.centroGravedadIdeal} cm`;
       document.getElementById(`${prefix}-peso-babor`).textContent = `${pesoBabor.toFixed(1)} kg`;
       document.getElementById(`${prefix}-peso-estribor`).textContent = `${pesoEstribor.toFixed(1)} kg`;
       
@@ -1176,7 +1209,6 @@
     function eliminarPersona(id){
       if(!confirm('Ziur zaude pertsona hau ezabatu nahi duzula?')) return;
       
-      // Pertsona hori alineazioetan hautatuta badago, garbitu hautaketa
       alineaciones.forEach(al => {
         for (let puesto in al.selecciones) {
           if (parseInt(al.selecciones[puesto]) === id) {
