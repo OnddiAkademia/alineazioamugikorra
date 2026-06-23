@@ -524,34 +524,6 @@
   </div>
 
   <script>
-    // ---------- LOCAL STORAGE ----------
-    function guardarDatosLocal() {
-      const data = {
-        personas: personas,
-        alineaciones: alineaciones,
-        alineacionActualId: alineacionActualId
-      };
-      localStorage.setItem('traineraData', JSON.stringify(data));
-    }
-
-    function cargarDatosLocal() {
-      const dataStr = localStorage.getItem('traineraData');
-      if (dataStr) {
-        try {
-          const data = JSON.parse(dataStr);
-          if (data.personas && data.alineaciones && data.alineaciones.length > 0) {
-            personas = data.personas;
-            alineaciones = data.alineaciones;
-            alineacionActualId = data.alineacionActualId || alineaciones[0].id;
-            return true;
-          }
-        } catch (e) {
-          console.error("Errorea datu lokalak kargatzean:", e);
-        }
-      }
-      return false;
-    }
-
     // ---------- CATEGORÍAS FIJAS ----------
     const categorias = {
       // harrobikoa (2 puntos)
@@ -641,14 +613,13 @@
     let alineaciones = [];
     let alineacionActualId = 1;
 
-    // ---------- ARRANQUE ----------
+    // ---------- ARRANQUE LIMPIO ----------
     document.addEventListener('DOMContentLoaded', ()=>{
-      const hayDatosLocales = cargarDatosLocal();
-      if (!hayDatosLocales) {
-        crearNuevaAlineacion("Alineazio Nagusia", true);
-      } else {
-        renderAlineaciones();
-      }
+      // Limpiamos cualquier rastro de localStorage anterior para evitar errores
+      localStorage.removeItem('traineraData');
+      
+      // Creamos una alineación inicial limpia
+      crearNuevaAlineacion("Alineazio Nagusia", true);
       renderListas();
       actualizarEstadisticas();
     });
@@ -671,7 +642,6 @@
       if(esPrimera) alineacionActualId = id;
       renderAlineaciones();
       cambiarAlineacion(id);
-      guardarDatosLocal();
     }
 
     function copiarAlineacion(){
@@ -688,7 +658,6 @@
       alineaciones.push(nueva);
       renderAlineaciones();
       cambiarAlineacion(nueva.id);
-      guardarDatosLocal();
     }
 
     function eliminarAlineacion(){
@@ -702,13 +671,11 @@
       alineaciones = alineaciones.filter(a=>a.id!==alineacionActualId);
       alineacionActualId = alineaciones[0].id;
       renderAlineaciones();
-      guardarDatosLocal();
     }
 
     function cambiarAlineacion(id){
       alineacionActualId = id;
       renderAlineaciones();
-      guardarDatosLocal();
     }
 
     // ---------- EXPORTAR E IMPORTAR ----------
@@ -780,7 +747,6 @@
             actualizarEstadisticas();
             renderAlineaciones();
             actualizarEstadisticasAlineacion(nuevaAlineacion);
-            guardarDatosLocal();
             
             alert("Alineazioa ondo inportatu da!");
           }
@@ -987,7 +953,6 @@
       actual.selecciones[puesto] = select.value;
       actualizarSelectores();
       actualizarEstadisticasAlineacion(actual);
-      guardarDatosLocal();
     }
 
     function actualizarPosicion(input, posicionBase){
@@ -1001,7 +966,6 @@
       const nuevaPos = posicionBase + ajuste;
       span.textContent = `+${nuevaPos}cm`;
       actualizarEstadisticasAlineacion(actual);
-      guardarDatosLocal();
     }
 
     function obtenerTipoPuesto(puesto){
@@ -1042,7 +1006,6 @@
               momentoTotal += persona.peso * posFinal;
               pesoTotal += persona.peso;
               
-              // Uso del peso ideal o, en su defecto, el peso normal registrado de la persona
               const pesoIdeal = pesosIdeales[persona.nombre] || persona.peso;
               momentoIdealTotal += pesoIdeal * posFinal;
               pesoIdealTotal += pesoIdeal;
@@ -1186,7 +1149,6 @@
       renderListas();
       actualizarEstadisticas();
       actualizarSelectores();
-      guardarDatosLocal();
       cerrarModal();
     }
     function actualizarPeso(id,peso){
@@ -1203,7 +1165,6 @@
         const actual = alineaciones.find(a=>a.id===alineacionActualId);
         if(actual) actualizarEstadisticasAlineacion(actual);
         actualizarSelectores();
-        guardarDatosLocal();
       }
     }
     function eliminarPersona(id){
@@ -1223,7 +1184,6 @@
       const actual = alineaciones.find(a=>a.id===alineacionActualId);
       if(actual) actualizarEstadisticasAlineacion(actual);
       actualizarSelectores();
-      guardarDatosLocal();
     }
     function cambiarTab(tab){
       document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
