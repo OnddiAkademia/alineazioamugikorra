@@ -434,12 +434,12 @@
 
     .extra-weight-panel {
       display: flex;
+      flex-direction: column;
       gap: 10px;
-      flex-wrap: wrap;
       justify-content: center;
       margin-top: 10px;
       margin-bottom: 10px;
-      padding: 10px;
+      padding: 12px;
       background: white;
       border-radius: 8px;
       border: 1px solid var(--border-color);
@@ -448,15 +448,22 @@
     .extra-item {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
       font-size: 11px;
+      flex-wrap: wrap;
     }
+    
     .extra-item input[type="number"] {
-      width: 50px;
+      width: 60px;
     }
     .extra-item input[type="checkbox"] {
       width: auto;
       cursor: pointer;
+    }
+    .extra-item label.main-label {
+      font-weight: 600;
+      min-width: 60px;
     }
 
     @media (max-width: 480px) {
@@ -645,8 +652,13 @@
         },
         extra1Activo: false,
         extra1Peso: 5,
+        extra1Distancia: 10,
         extra2Activo: false,
         extra2Peso: 5,
+        extra2Distancia: 180,
+        extra3Activo: false,
+        extra3Peso: 5,
+        extra3Distancia: 1000,
         estadisticas: {
           pesoTotal:0, pesoPromedio:0, centroGravedad:0, centroGravedadIdeal:0, 
           cgSistema:0, personasSeleccionadas:0, puntuacionTotal:0, 
@@ -670,8 +682,13 @@
         selecciones: {...actual.selecciones},
         extra1Activo: actual.extra1Activo,
         extra1Peso: actual.extra1Peso,
+        extra1Distancia: actual.extra1Distancia,
         extra2Activo: actual.extra2Activo,
         extra2Peso: actual.extra2Peso,
+        extra2Distancia: actual.extra2Distancia,
+        extra3Activo: actual.extra3Activo,
+        extra3Peso: actual.extra3Peso,
+        extra3Distancia: actual.extra3Distancia,
         estadisticas: {...actual.estadisticas}
       };
       alineaciones.push(nueva);
@@ -705,7 +722,7 @@
         alineacion: actual,
         personas: personas,
         fechaExportacion: new Date().toISOString(),
-        version: "1.3"
+        version: "1.5"
       };
 
       const datosStr = JSON.stringify(datosExportar, null, 2);
@@ -740,8 +757,13 @@
               nombre: datos.alineacion.nombre + " (inportatua)",
               extra1Activo: datos.alineacion.extra1Activo || false,
               extra1Peso: datos.alineacion.extra1Peso || 5,
+              extra1Distancia: datos.alineacion.extra1Distancia !== undefined ? datos.alineacion.extra1Distancia : 10,
               extra2Activo: datos.alineacion.extra2Activo || false,
-              extra2Peso: datos.alineacion.extra2Peso || 5
+              extra2Peso: datos.alineacion.extra2Peso || 5,
+              extra2Distancia: datos.alineacion.extra2Distancia !== undefined ? datos.alineacion.extra2Distancia : 180,
+              extra3Activo: datos.alineacion.extra3Activo || false,
+              extra3Peso: datos.alineacion.extra3Peso || 5,
+              extra3Distancia: datos.alineacion.extra3Distancia !== undefined ? datos.alineacion.extra3Distancia : 1000
             };
             
             const index = alineaciones.findIndex(a => a.id === alineacionActualId);
@@ -828,13 +850,24 @@
         <div class="extra-weight-panel">
           <div class="extra-item">
             <input type="checkbox" id="extra1-check-${alineacion.id}" ${alineacion.extra1Activo ? 'checked' : ''} onchange="toggleExtra(${alineacion.id}, 1, this.checked)">
-            <label for="extra1-check-${alineacion.id}">Gehitu pisua <b>20 cm</b>-ra:</label>
+            <label class="main-label" for="extra1-check-${alineacion.id}">1. Estra:</label>
             <input type="number" id="extra1-peso-${alineacion.id}" value="${alineacion.extra1Peso}" min="0" step="0.5" onchange="updateExtraPeso(${alineacion.id}, 1, this.value)"> kg
+            <label>Dist:</label>
+            <input type="number" id="extra1-dist-${alineacion.id}" value="${alineacion.extra1Distancia}" step="1" onchange="updateExtraDistancia(${alineacion.id}, 1, this.value)"> cm
           </div>
           <div class="extra-item">
             <input type="checkbox" id="extra2-check-${alineacion.id}" ${alineacion.extra2Activo ? 'checked' : ''} onchange="toggleExtra(${alineacion.id}, 2, this.checked)">
-            <label for="extra2-check-${alineacion.id}">Gehitu pisua <b>200 cm</b>-ra:</label>
+            <label class="main-label" for="extra2-check-${alineacion.id}">2. Estra:</label>
             <input type="number" id="extra2-peso-${alineacion.id}" value="${alineacion.extra2Peso}" min="0" step="0.5" onchange="updateExtraPeso(${alineacion.id}, 2, this.value)"> kg
+            <label>Dist:</label>
+            <input type="number" id="extra2-dist-${alineacion.id}" value="${alineacion.extra2Distancia}" step="1" onchange="updateExtraDistancia(${alineacion.id}, 2, this.value)"> cm
+          </div>
+          <div class="extra-item">
+            <input type="checkbox" id="extra3-check-${alineacion.id}" ${alineacion.extra3Activo ? 'checked' : ''} onchange="toggleExtra(${alineacion.id}, 3, this.checked)">
+            <label class="main-label" for="extra3-check-${alineacion.id}">3. Estra:</label>
+            <input type="number" id="extra3-peso-${alineacion.id}" value="${alineacion.extra3Peso}" min="0" step="0.5" onchange="updateExtraPeso(${alineacion.id}, 3, this.value)"> kg
+            <label>Dist:</label>
+            <input type="number" id="extra3-dist-${alineacion.id}" value="${alineacion.extra3Distancia}" step="1" onchange="updateExtraDistancia(${alineacion.id}, 3, this.value)"> cm
           </div>
         </div>
 
@@ -1006,6 +1039,7 @@
       if(actual) {
         if(num === 1) actual.extra1Activo = isChecked;
         if(num === 2) actual.extra2Activo = isChecked;
+        if(num === 3) actual.extra3Activo = isChecked;
         actualizarEstadisticasAlineacion(actual);
       }
     }
@@ -1016,6 +1050,18 @@
         const peso = parseFloat(value) || 0;
         if(num === 1) actual.extra1Peso = peso;
         if(num === 2) actual.extra2Peso = peso;
+        if(num === 3) actual.extra3Peso = peso;
+        actualizarEstadisticasAlineacion(actual);
+      }
+    }
+
+    function updateExtraDistancia(id, num, value) {
+      const actual = alineaciones.find(a=>a.id===id);
+      if(actual) {
+        const dist = parseFloat(value) || 0;
+        if(num === 1) actual.extra1Distancia = dist;
+        if(num === 2) actual.extra2Distancia = dist;
+        if(num === 3) actual.extra3Distancia = dist;
         actualizarEstadisticasAlineacion(actual);
       }
     }
@@ -1028,9 +1074,9 @@
       let pesoBabor = 0, pesoEstribor = 0;
       let personasSeleccionadas = 0, puntuacionTotal = 0, harrobikoak = 0, berezkoak = 0;
       
-      // Inicializar el Sistema Total (Trainera: 200kg a 600cm)
-      let pesoTotalSistema = 200; 
-      let momentoTotalSistema = 200 * 600; 
+      // Inicializar el Sistema Total SIN LA TRAINERA (0 kg)
+      let pesoTotalSistema = 0; 
+      let momentoTotalSistema = 0; 
 
       selectores.forEach(sel=>{
         if(sel.value){
@@ -1066,7 +1112,7 @@
               momentoIdealTotal += pesoIdeal * posFinal;
               pesoIdealTotal += pesoIdeal;
               
-              // Cálculos del Sistema Completo
+              // Cálculos del Sistema (Osoa)
               momentoTotalSistema += persona.peso * posFinal;
               pesoTotalSistema += persona.peso;
 
@@ -1076,14 +1122,18 @@
         }
       });
 
-      // Añadir pesos extras si están activos
+      // Añadir pesos extras si están activos (orain dinamikoak dira)
       if (alineacion.extra1Activo) {
         pesoTotalSistema += alineacion.extra1Peso;
-        momentoTotalSistema += alineacion.extra1Peso * 20; // Extra a 20 cm
+        momentoTotalSistema += alineacion.extra1Peso * alineacion.extra1Distancia;
       }
       if (alineacion.extra2Activo) {
         pesoTotalSistema += alineacion.extra2Peso;
-        momentoTotalSistema += alineacion.extra2Peso * 200; // Extra a 200 cm
+        momentoTotalSistema += alineacion.extra2Peso * alineacion.extra2Distancia;
+      }
+      if (alineacion.extra3Activo) {
+        pesoTotalSistema += alineacion.extra3Peso;
+        momentoTotalSistema += alineacion.extra3Peso * alineacion.extra3Distancia;
       }
 
       // Guardado de Stats
@@ -1108,8 +1158,12 @@
         alineacion.estadisticas.centroGravedadIdeal = '--';
       }
 
-      // CG Sistema (Osoa)
-      alineacion.estadisticas.cgSistema = (momentoTotalSistema / pesoTotalSistema).toFixed(1);
+      // CG Sistema (Osoa - sin la trainera)
+      if (pesoTotalSistema > 0) {
+        alineacion.estadisticas.cgSistema = (momentoTotalSistema / pesoTotalSistema).toFixed(1);
+      } else {
+        alineacion.estadisticas.cgSistema = '--';
+      }
 
       // Render de los datos en la interfaz
       const prefix = `alineacion-${alineacion.id}`;
