@@ -583,6 +583,7 @@
     };
 
     // ---------- DATOS REALES (Base) ----------
+    // Eliminados Julen Iriondo (28) y Erik Tejada (30) según lo solicitado
     let personas = [
       {id:3, nombre:"Ander Balda", peso:90.3, tipo:"remero"},
       {id:4, nombre:"Joanes Balenciaga", peso:73.2, tipo:"remero"},
@@ -605,9 +606,7 @@
       {id:24, nombre:"Cosme Tarrio", peso:74.4, tipo:"remero"},
       {id:26, nombre:"Iñaki Urtubia", peso:75.8, tipo:"remero"},
       {id:27, nombre:"Arkaitz Diaz", peso:59.9, tipo:"patron"},
-      {id:28, nombre:"Julen Iriondo", peso:55, tipo:"patron"},
-      {id:29, nombre:"Jon Iruretagoiena", peso:58.3, tipo:"patron"},
-      {id:30, nombre:"Erik Tejada", peso:55, tipo:"patron"}
+      {id:29, nombre:"Jon Iruretagoiena", peso:58.3, tipo:"patron"}
     ];
 
     const posicionesBase = {
@@ -804,6 +803,7 @@
             <div class="label" style="color:rgba(255,255,255,0.9);">CG Osoa (Sistema)</div>
           </div>
           <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-cg">-- cm</div><div class="label">CG Tripulazioa</div></div>
+          <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-cg-ideal">-- cm</div><div class="label">CG Ideala</div></div>
           <div class="stat-alineacion"><div class="valor" id="alineacion-${alineacion.id}-media">0 kg</div><div class="label">Batez Bestekoa</div></div>
           
           <div class="stat-alineacion" style="background:var(--babor-color); color:#fff;">
@@ -1024,6 +1024,7 @@
     function actualizarEstadisticasAlineacion(alineacion){
       const selectores = document.querySelectorAll(`#alineacion-${alineacion.id} select`);
       let pesoTripulacion = 0, momentoTripulacion = 0;
+      let pesoIdealTotal = 0, momentoIdealTotal = 0;
       let pesoBabor = 0, pesoEstribor = 0;
       let personasSeleccionadas = 0, puntuacionTotal = 0, harrobikoak = 0, berezkoak = 0;
       
@@ -1056,9 +1057,16 @@
               const ajuste = alineacion.ajustesPosicion[tipo]||0;
               const posFinal = posBase + ajuste;
               
+              // Cálculos Reales
               momentoTripulacion += persona.peso * posFinal;
               pesoTripulacion += persona.peso;
               
+              // Cálculos Ideales (CG Ideala)
+              const pesoIdeal = pesosIdeales[persona.nombre] || persona.peso;
+              momentoIdealTotal += pesoIdeal * posFinal;
+              pesoIdealTotal += pesoIdeal;
+              
+              // Cálculos del Sistema Completo
               momentoTotalSistema += persona.peso * posFinal;
               pesoTotalSistema += persona.peso;
 
@@ -1078,7 +1086,7 @@
         momentoTotalSistema += alineacion.extra2Peso * 200; // Extra a 200 cm
       }
 
-      // Cálculos y Guardado de Stats
+      // Guardado de Stats
       alineacion.estadisticas.pesoTotal = pesoTripulacion;
       alineacion.estadisticas.personasSeleccionadas = personasSeleccionadas;
       alineacion.estadisticas.pesoPromedio = personasSeleccionadas>0 ? (pesoTripulacion/personasSeleccionadas).toFixed(1) : '0.0';
@@ -1088,12 +1096,16 @@
       alineacion.estadisticas.pesoBabor = pesoBabor;
       alineacion.estadisticas.pesoEstribor = pesoEstribor;
 
-      // CG Tripulación (solo remeros)
+      // CG Tripulación (solo remeros) y CG Ideala
       if(personasSeleccionadas){
         const cg = momentoTripulacion / pesoTripulacion;
         alineacion.estadisticas.centroGravedad = cg.toFixed(1);
+        
+        const cgIdeal = momentoIdealTotal / pesoIdealTotal;
+        alineacion.estadisticas.centroGravedadIdeal = cgIdeal.toFixed(1);
       } else {
         alineacion.estadisticas.centroGravedad = '--';
+        alineacion.estadisticas.centroGravedadIdeal = '--';
       }
 
       // CG Sistema (Osoa)
@@ -1103,6 +1115,7 @@
       const prefix = `alineacion-${alineacion.id}`;
       document.getElementById(`${prefix}-media`).textContent = `${alineacion.estadisticas.pesoPromedio} kg`;
       document.getElementById(`${prefix}-cg`).textContent = `${alineacion.estadisticas.centroGravedad} cm`;
+      document.getElementById(`${prefix}-cg-ideal`).textContent = `${alineacion.estadisticas.centroGravedadIdeal} cm`;
       document.getElementById(`${prefix}-cg-total`).textContent = `${alineacion.estadisticas.cgSistema} cm`;
       document.getElementById(`${prefix}-peso-babor`).textContent = `${pesoBabor.toFixed(1)} kg`;
       document.getElementById(`${prefix}-peso-estribor`).textContent = `${pesoEstribor.toFixed(1)} kg`;
