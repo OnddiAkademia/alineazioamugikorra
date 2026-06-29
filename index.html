@@ -438,6 +438,7 @@
       flex-wrap: wrap;
       justify-content: center;
       margin-top: 10px;
+      margin-bottom: 10px;
       padding: 10px;
       background: white;
       border-radius: 8px;
@@ -583,7 +584,6 @@
     };
 
     // ---------- DATOS REALES (Base) ----------
-    // Eliminados Julen Iriondo (28) y Erik Tejada (30) según lo solicitado
     let personas = [
       {id:3, nombre:"Ander Balda", peso:90.3, tipo:"remero"},
       {id:4, nombre:"Joanes Balenciaga", peso:73.2, tipo:"remero"},
@@ -825,6 +825,19 @@
           </div>
         </div>
 
+        <div class="extra-weight-panel">
+          <div class="extra-item">
+            <input type="checkbox" id="extra1-check-${alineacion.id}" ${alineacion.extra1Activo ? 'checked' : ''} onchange="toggleExtra(${alineacion.id}, 1, this.checked)">
+            <label for="extra1-check-${alineacion.id}">Gehitu pisua <b>20 cm</b>-ra:</label>
+            <input type="number" id="extra1-peso-${alineacion.id}" value="${alineacion.extra1Peso}" min="0" step="0.5" onchange="updateExtraPeso(${alineacion.id}, 1, this.value)"> kg
+          </div>
+          <div class="extra-item">
+            <input type="checkbox" id="extra2-check-${alineacion.id}" ${alineacion.extra2Activo ? 'checked' : ''} onchange="toggleExtra(${alineacion.id}, 2, this.checked)">
+            <label for="extra2-check-${alineacion.id}">Gehitu pisua <b>200 cm</b>-ra:</label>
+            <input type="number" id="extra2-peso-${alineacion.id}" value="${alineacion.extra2Peso}" min="0" step="0.5" onchange="updateExtraPeso(${alineacion.id}, 2, this.value)"> kg
+          </div>
+        </div>
+
         <div class="alineacion-vertical">
           <div class="puesto-vertical proel">
             <label>Proela</label>
@@ -952,19 +965,6 @@
           <div class="puesto-vertical patron">
             <label>Patroia (180 cm)</label>
             <select class="selector-patron" data-puesto="patron" onchange="guardarSeleccion(this)"><option value="">Hautatu patroia</option></select>
-          </div>
-        </div>
-        
-        <div class="extra-weight-panel">
-          <div class="extra-item">
-            <input type="checkbox" id="extra1-check-${alineacion.id}" ${alineacion.extra1Activo ? 'checked' : ''} onchange="toggleExtra(${alineacion.id}, 1, this.checked)">
-            <label for="extra1-check-${alineacion.id}">Gehitu pisua <b>20 cm</b>-ra:</label>
-            <input type="number" id="extra1-peso-${alineacion.id}" value="${alineacion.extra1Peso}" min="0" step="0.5" onchange="updateExtraPeso(${alineacion.id}, 1, this.value)"> kg
-          </div>
-          <div class="extra-item">
-            <input type="checkbox" id="extra2-check-${alineacion.id}" ${alineacion.extra2Activo ? 'checked' : ''} onchange="toggleExtra(${alineacion.id}, 2, this.checked)">
-            <label for="extra2-check-${alineacion.id}">Gehitu pisua <b>200 cm</b>-ra:</label>
-            <input type="number" id="extra2-peso-${alineacion.id}" value="${alineacion.extra2Peso}" min="0" step="0.5" onchange="updateExtraPeso(${alineacion.id}, 2, this.value)"> kg
           </div>
         </div>
       `;
